@@ -2,16 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.renderwakeup">
 
-    <!-- 인터넷 권한 -->
+    <!-- 인터넷 접근 권한 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- 네트워크 상태 확인 권한 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!-- 포그라운드 서비스 권한 -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <!-- 부팅 시 자동 실행 권한 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!-- 절전 모드 방지 권한 -->
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- 포그라운드 서비스 권한 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- 배터리 최적화 무시 권한 -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
         android:allowBackup="true"
@@ -19,8 +19,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.RenderWakeUp">
+        android:theme="@style/Theme.RenderWakeUp"
+        android:usesCleartextTraffic="true">
         
+        <!-- 메인 액티비티 -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -31,7 +33,18 @@
             </intent-filter>
         </activity>
         
-        <!-- WorkManager 설정 -->
+        <!-- 부팅 시 자동 실행 리시버 -->
+        <receiver
+            android:name=".receiver.BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+        
+        <!-- WorkManager 프로바이더 설정 -->
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
@@ -41,15 +54,6 @@
                 android:value="androidx.startup" />
         </provider>
         
-        <!-- 부팅 시 자동 실행 리시버 -->
-        <receiver
-            android:name=".receiver.BootReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>
