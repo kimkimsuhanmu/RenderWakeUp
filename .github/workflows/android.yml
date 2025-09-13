@@ -2,9 +2,9 @@ name: Android CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
   workflow_dispatch:  # 수동으로 워크플로우 실행 가능
 
 jobs:
