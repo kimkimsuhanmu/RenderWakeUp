@@ -1,92 +1,57 @@
-이 프로젝트는 [`EasyNext`](https://github.com/easynext/easynext)를 사용해 생성된 [Next.js](https://nextjs.org) 프로젝트입니다.
+# 렌더웨이크 (Render Wake-Up)
 
-## Getting Started
+Render 무료 플랜 서버가 슬립모드로 전환되는 것을 방지하는 안드로이드 앱입니다.
 
-개발 서버를 실행합니다.<br/>
-환경에 따른 명령어를 사용해주세요.
+## 주요 기능
+
+- URL 핑(Keep-Alive) 주기적 자동 호출
+- 백그라운드 영구 실행 및 절전 모드 방지
+- 호출 실패 시 지정 이메일 알림 발송
+- 여러 URL 다중 관리(추가·수정·삭제)
+- 수동 즉시 깨우기 버튼
+
+## 빌드 방법
+
+### 안드로이드 스튜디오를 사용하여 빌드하기
+
+1. 안드로이드 스튜디오를 설치합니다.
+2. 이 프로젝트를 안드로이드 스튜디오에서 엽니다.
+3. `Build > Build Bundle(s) / APK(s) > Build APK(s)` 메뉴를 선택합니다.
+4. 빌드가 완료되면 `app/build/outputs/apk/release/app-release.apk` 파일이 생성됩니다.
+
+### 명령줄에서 빌드하기
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 디버그 APK 빌드
+./gradlew assembleDebug
+
+# 릴리즈 APK 빌드
+./gradlew assembleRelease
 ```
 
-브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 결과를 확인할 수 있습니다.
+## 설치 방법
 
-`app/page.tsx` 파일을 수정하여 페이지를 편집할 수 있습니다. 파일을 수정하면 자동으로 페이지가 업데이트됩니다.
+1. 빌드된 APK 파일을 안드로이드 기기에 복사합니다.
+2. 안드로이드 기기에서 APK 파일을 실행하여 설치합니다.
+3. 설치 중 "알 수 없는 출처" 경고가 표시되면, 설정에서 "알 수 없는 출처" 앱 설치를 허용합니다.
 
-## 기본 포함 라이브러리
+## 사용 방법
 
-- [Next.js](https://nextjs.org)
-- [React](https://react.dev)
-- [Tailwind CSS](https://tailwindcss.com)
-- [TypeScript](https://www.typescriptlang.org)
-- [ESLint](https://eslint.org)
-- [Prettier](https://prettier.io)
-- [Shadcn UI](https://ui.shadcn.com)
-- [Lucide Icon](https://lucide.dev)
-- [date-fns](https://date-fns.org)
-- [react-use](https://github.com/streamich/react-use)
-- [es-toolkit](https://github.com/toss/es-toolkit)
-- [Zod](https://zod.dev)
-- [React Query](https://tanstack.com/query/latest)
-- [React Hook Form](https://react-hook-form.com)
-- [TS Pattern](https://github.com/gvergnaud/ts-pattern)
+1. 앱을 실행합니다.
+2. 배터리 최적화 제외 설정을 허용합니다.
+3. "+" 버튼을 눌러 URL을 추가합니다.
+4. URL과 핑 주기를 입력합니다.
+5. 이메일 알림을 활성화하려면 토글을 켜고 이메일 주소를 입력합니다.
+6. "저장" 버튼을 눌러 URL을 저장합니다.
+7. 앱은 백그라운드에서 계속 실행되며, 지정된 주기마다 URL에 핑을 보냅니다.
 
-## 사용 가능한 명령어
+## 주의사항
 
-한글버전 사용
+- 앱이 제대로 작동하려면 배터리 최적화에서 제외해야 합니다.
+- 기기를 재부팅해도 자동으로 실행됩니다.
+- 앱은 최소 Android 8.0 (Oreo) 이상에서 작동합니다.
+- 주기적인 핑은 최소 15분 간격으로 설정됩니다.
 
-```sh
-easynext lang ko
-```
+## 라이선스
 
-최신버전으로 업데이트
-
-```sh
-npm i -g @easynext/cli@latest
-# or
-yarn add -g @easynext/cli@latest
-# or
-pnpm add -g @easynext/cli@latest
-```
-
-Supabase 설정
-
-```sh
-easynext supabase
-```
-
-Next-Auth 설정
-
-```sh
-easynext auth
-
-# ID,PW 로그인
-easynext auth idpw
-# 카카오 로그인
-easynext auth kakao
-```
-
-유용한 서비스 연동
-
-```sh
-# Google Analytics
-easynext gtag
-
-# Microsoft Clarity
-easynext clarity
-
-# ChannelIO
-easynext channelio
-
-# Sentry
-easynext sentry
-
-# Google Adsense
-easynext adsense
-```
+이 프로젝트는 MIT 라이선스 하에 배포됩니다.

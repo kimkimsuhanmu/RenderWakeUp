@@ -1,44 +1,37 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Gradle files
+.gradle/
+build/
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+# Local configuration file (sdk path, etc)
+local.properties
 
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
+# Log/OS Files
+*.log
 .DS_Store
-*.pem
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
+# Android Studio generated files and folders
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+output.json
 
-# env files (can opt-in for committing if needed)
-.env*
+# IntelliJ
+*.iml
+.idea/
+misc.xml
+deploymentTargetDropDown.xml
+render.experimental.xml
 
-# vercel
-.vercel
+# Keystore files
+*.jks
+*.keystore
 
-# EasyNext
-.easynext
+# Google Services (e.g. APIs or Firebase)
+google-services.json
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# Android Profiling
+*.hprof
+
+# Vooster
+.vooster/
