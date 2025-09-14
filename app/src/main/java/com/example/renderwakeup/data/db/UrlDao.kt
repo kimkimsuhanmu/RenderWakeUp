@@ -23,6 +23,12 @@ interface UrlDao {
     fun getAllUrls(): LiveData<List<UrlEntity>>
     
     /**
+     * 모든 URL 목록을 동기적으로 가져옵니다.
+     */
+    @Query("SELECT * FROM urls ORDER BY createdAt DESC")
+    suspend fun getAllUrlsSync(): List<UrlEntity>
+    
+    /**
      * ID로 특정 URL을 가져옵니다.
      */
     @Query("SELECT * FROM urls WHERE id = :id")

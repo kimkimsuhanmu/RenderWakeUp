@@ -6,6 +6,7 @@ import com.example.renderwakeup.data.db.UrlDao
 import com.example.renderwakeup.data.model.PingStatus
 import com.example.renderwakeup.data.model.UrlEntity
 import com.example.renderwakeup.network.ApiClient
+import com.example.renderwakeup.util.EmailSender
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Date
@@ -24,6 +25,16 @@ class UrlRepository(private val urlDao: UrlDao) {
      */
     fun getAllUrls(): LiveData<List<UrlEntity>> {
         return urlDao.getAllUrls()
+    }
+    
+    /**
+     * 모든 URL 목록을 동기적으로 가져옵니다.
+     * 포그라운드 서비스에서 사용하기 위한 메서드입니다.
+     */
+    suspend fun getAllUrlsSync(): List<UrlEntity> {
+        return withContext(Dispatchers.IO) {
+            urlDao.getAllUrlsSync()
+        }
     }
     
     /**
@@ -84,11 +95,60 @@ class UrlRepository(private val urlDao: UrlDao) {
                 // 핑 결과 업데이트
                 urlDao.updateUrlStatus(url.id, status)
                 
+                // 핑 실패 시 이메일 알림 전송
+                if (!isSuccess && url.emailNotification && url.emailAddress != null) {
+                    try {
+                        val subject = "렌더웨이크 알림: ${url.url} 핑 실패"
+                        val body = """
+                            안녕하세요,
+                            
+                            ${url.url} 사이트에 대한 핑이 실패했습니다.
+                            상태 코드: ${response.code()}
+                            
+                            마지막 시도 시간: ${Date()}
+                            
+                            사이트가 정상적으로 작동하는지 확인해주세요.
+                            
+                            감사합니다.
+                            렌더웨이크 앱
+                        """.trimIndent()
+                        
+                        EmailSender.sendEmail(url.emailAddress, subject, body)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to send email notification", e)
+                    }
+                }
+                
                 isSuccess
             } catch (e: Exception) {
                 // 예외 발생 시 오류로 처리
                 Log.e(TAG, "Ping failed with exception", e)
                 urlDao.updateUrlStatus(url.id, PingStatus.ERROR)
+                
+                // 핑 실패 시 이메일 알림 전송
+                if (url.emailNotification && url.emailAddress != null) {
+                    try {
+                        val subject = "렌더웨이크 알림: ${url.url} 핑 실패"
+                        val body = """
+                            안녕하세요,
+                            
+                            ${url.url} 사이트에 대한 핑이 실패했습니다.
+                            오류: ${e.message}
+                            
+                            마지막 시도 시간: ${Date()}
+                            
+                            사이트가 정상적으로 작동하는지 확인해주세요.
+                            
+                            감사합니다.
+                            렌더웨이크 앱
+                        """.trimIndent()
+                        
+                        EmailSender.sendEmail(url.emailAddress, subject, body)
+                    } catch (emailEx: Exception) {
+                        Log.e(TAG, "Failed to send email notification", emailEx)
+                    }
+                }
+                
                 false
             }
         }

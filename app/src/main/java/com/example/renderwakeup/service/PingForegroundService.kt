@@ -31,6 +31,9 @@ class PingForegroundService : Service() {
     private lateinit var urlRepository: UrlRepository
     private lateinit var notificationHelper: NotificationHelper
     private var wakeLock: PowerManager.WakeLock? = null
+    
+    // 디버깅용 카운터
+    private var pingCount = 0
 
     override fun onCreate() {
         super.onCreate()
@@ -88,6 +91,9 @@ class PingForegroundService : Service() {
             
             while (isRunning.get()) {
                 try {
+                    pingCount++
+                    Log.d(TAG, "Ping job iteration #$pingCount")
+                    
                     // 핑이 필요한 URL 목록 조회 및 핑 전송
                     val urlsNeedingPing = urlRepository.getUrlsNeedingPing()
                     Log.d(TAG, "Found ${urlsNeedingPing.size} URLs needing ping")
@@ -96,17 +102,39 @@ class PingForegroundService : Service() {
                     updateNotification(urlsNeedingPing.size)
                     
                     // 각 URL에 핑 요청 보내기
+                    var successCount = 0
                     for (url in urlsNeedingPing) {
                         try {
                             val isSuccess = urlRepository.pingUrl(url)
-                            Log.d(TAG, "Ping to ${url.url}: ${if (isSuccess) "success" else "failed"}")
+                            if (isSuccess) {
+                                successCount++
+                                Log.d(TAG, "Ping to ${url.url} succeeded")
+                            } else {
+                                Log.e(TAG, "Ping to ${url.url} failed")
+                            }
                         } catch (e: Exception) {
                             Log.e(TAG, "Error pinging ${url.url}", e)
                         }
                     }
                     
-                    // 최소 1분 대기 (배터리 소모 방지)
-                    delay(60_000)
+                    // 핑 결과 로그
+                    Log.d(TAG, "Ping results: $successCount/${urlsNeedingPing.size} successful")
+                    
+                    // 만약 URL이 없으면 모든 URL 확인
+                    if (urlsNeedingPing.isEmpty()) {
+                        val allUrls = urlRepository.getAllUrlsSync()
+                        if (allUrls.isEmpty()) {
+                            Log.d(TAG, "No URLs found in database")
+                        } else {
+                            Log.d(TAG, "Found ${allUrls.size} URLs in database, but none need ping yet")
+                            for (url in allUrls) {
+                                Log.d(TAG, "URL: ${url.url}, interval: ${url.interval}, lastPing: ${url.lastPingTime}")
+                            }
+                        }
+                    }
+                    
+                    // 최소 30초 대기 (배터리 소모 방지)
+                    delay(30_000)
                 } catch (e: Exception) {
                     Log.e(TAG, "Error in ping job", e)
                     delay(60_000) // 오류 발생 시 1분 대기 후 재시도
