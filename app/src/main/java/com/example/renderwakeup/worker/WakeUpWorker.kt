@@ -10,6 +10,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.example.renderwakeup.data.db.AppDatabase
 import com.example.renderwakeup.data.model.PingStatus
+import com.example.renderwakeup.data.model.UrlEntity
 import com.example.renderwakeup.data.repository.UrlRepository
 import com.example.renderwakeup.util.EmailConfigManager
 import com.example.renderwakeup.util.EmailSender
@@ -132,7 +133,7 @@ class WakeUpWorker(
         val body = """
             안녕하세요,
             
-            ${url.url} 사이트에 대한 핑이 $failCount회 연속 실패했습니다.
+            ${url.url} 사이트에 대한 핑이 ${failCount}회 연속 실패했습니다.
             
             마지막 시도 시간: ${url.lastPingTime}
             
@@ -177,7 +178,7 @@ class WakeUpWorker(
         val body = """
             안녕하세요,
             
-            ${url.url} 사이트에 대한 핑이 $failCount회 연속 실패했습니다.
+            ${url.url} 사이트에 대한 핑이 ${failCount}회 연속 실패했습니다.
             
             마지막 시도 시간: ${url.lastPingTime}
             
