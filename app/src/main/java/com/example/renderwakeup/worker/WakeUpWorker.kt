@@ -49,15 +49,21 @@ class WakeUpWorker(
      * @return 작업 결과
      */
     override suspend fun doWork(): Result {
-        Log.d(TAG, "WakeUpWorker started")
+        Log.d(TAG, "WakeUpWorker started at ${System.currentTimeMillis()}")
         
         try {
             // 포그라운드 서비스로 실행
             setForeground(createForegroundInfo(0))
+            Log.d(TAG, "Foreground service started")
             
             // 핑이 필요한 URL 목록 조회
             val urlsNeedingPing = urlRepository.getUrlsNeedingPing()
             Log.d(TAG, "Found ${urlsNeedingPing.size} URLs needing ping")
+            
+            if (urlsNeedingPing.isEmpty()) {
+                Log.d(TAG, "No URLs need pinging at this time")
+                return Result.success()
+            }
             
             // 포그라운드 알림 업데이트
             setForeground(createForegroundInfo(urlsNeedingPing.size))
@@ -66,6 +72,7 @@ class WakeUpWorker(
             var successCount = 0
             
             for (url in urlsNeedingPing) {
+                Log.d(TAG, "Pinging URL: ${url.url} (interval: ${url.interval} minutes)")
                 val isSuccess = urlRepository.pingUrl(url)
                 
                 if (isSuccess) {
@@ -76,6 +83,7 @@ class WakeUpWorker(
                     
                     // 연속 3회 이상 실패 시 알림 표시
                     if (url.failCount + 1 >= 3) {
+                        Log.w(TAG, "URL ${url.url} has failed ${url.failCount + 1} times, showing notification")
                         // 알림 표시
                         notificationHelper.showPingFailureNotification(url, url.failCount + 1)
                         

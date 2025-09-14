@@ -24,8 +24,11 @@ object WorkManagerHelper {
      * @param intervalMinutes 작업 주기 (분 단위, 최소 1분)
      */
     fun schedulePeriodicPingWork(context: Context, intervalMinutes: Long = MIN_PERIODIC_INTERVAL_MINUTES) {
+        android.util.Log.d("WorkManagerHelper", "Scheduling periodic ping work with interval: $intervalMinutes minutes")
+        
         // 최소 주기 확인
         val finalInterval = intervalMinutes.coerceAtLeast(MIN_PERIODIC_INTERVAL_MINUTES)
+        android.util.Log.d("WorkManagerHelper", "Final interval: $finalInterval minutes")
         
         // 작업 제약 조건 설정
         val constraints = Constraints.Builder()
@@ -51,6 +54,8 @@ object WorkManagerHelper {
             ExistingPeriodicWorkPolicy.UPDATE, // REPLACE 대신 UPDATE 사용 (권장)
             workRequest
         )
+        
+        android.util.Log.d("WorkManagerHelper", "Periodic work scheduled successfully")
     }
     
     /**

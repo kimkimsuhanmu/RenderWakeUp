@@ -69,7 +69,33 @@ class UrlRepository(private val urlDao: UrlDao) {
      * 핑이 필요한 URL 목록을 가져옵니다.
      */
     suspend fun getUrlsNeedingPing(): List<UrlEntity> {
-        return urlDao.getUrlsNeedingPing()
+        return withContext(Dispatchers.IO) {
+            val allUrls = urlDao.getAllUrlsSync()
+            val currentTime = System.currentTimeMillis()
+            
+            Log.d(TAG, "Checking ${allUrls.size} URLs for ping needs")
+            
+            val urlsNeedingPing = allUrls.filter { url ->
+                val needsPing = if (url.lastPingTime == null) {
+                    Log.d(TAG, "URL ${url.url} has never been pinged, needs ping")
+                    true
+                } else {
+                    val timeSinceLastPing = currentTime - url.lastPingTime!!.time
+                    val intervalMillis = url.interval * 60 * 1000 // 분을 밀리초로 변환
+                    val needsPing = timeSinceLastPing >= intervalMillis
+                    
+                    Log.d(TAG, "URL ${url.url}: lastPing=${url.lastPingTime}, " +
+                            "timeSinceLastPing=${timeSinceLastPing}ms, " +
+                            "interval=${intervalMillis}ms, needsPing=$needsPing")
+                    
+                    needsPing
+                }
+                needsPing
+            }
+            
+            Log.d(TAG, "Found ${urlsNeedingPing.size} URLs needing ping")
+            urlsNeedingPing
+        }
     }
     
     /**

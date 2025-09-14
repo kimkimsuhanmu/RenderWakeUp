@@ -57,7 +57,7 @@ interface UrlDao {
      * 마지막 핑 시간이 interval 분보다 오래된 URL들을 반환합니다.
      */
     @Query("SELECT * FROM urls WHERE lastPingTime IS NULL OR " +
-           "(strftime('%s', 'now') - strftime('%s', lastPingTime)) / 60 >= interval")
+           "datetime(lastPingTime, '+' || interval || ' minutes') <= datetime('now')")
     suspend fun getUrlsNeedingPing(): List<UrlEntity>
     
     /**

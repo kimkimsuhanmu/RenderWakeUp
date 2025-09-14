@@ -499,17 +499,23 @@ class MainActivity : AppCompatActivity() {
      * 핑 포그라운드 서비스를 시작합니다.
      */
     private fun startPingService() {
+        Log.d(TAG, "Starting ping service...")
+        
         // 알림 권한이 있는지 확인
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     this,
                     Manifest.permission.POST_NOTIFICATIONS
                 ) == PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "Notification permission granted, starting service")
                 PingForegroundService.startService(this)
+            } else {
+                Log.d(TAG, "Notification permission not granted, will start after permission granted")
             }
             // 권한이 없으면 requestPermissionLauncher에서 권한 획득 후 서비스 시작
         } else {
             // Android 13 미만에서는 권한 확인 없이 서비스 시작
+            Log.d(TAG, "Android 13 below, starting service without permission check")
             PingForegroundService.startService(this)
         }
     }
