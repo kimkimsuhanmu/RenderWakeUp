@@ -1,5 +1,6 @@
 package com.example.renderwakeup.data.repository
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.renderwakeup.data.db.UrlDao
 import com.example.renderwakeup.data.model.PingStatus
@@ -15,6 +16,8 @@ import java.util.Date
  * @property urlDao URL 데이터 접근 객체
  */
 class UrlRepository(private val urlDao: UrlDao) {
+    
+    private val TAG = "UrlRepository"
     
     /**
      * 모든 URL 목록을 가져옵니다.
@@ -68,8 +71,12 @@ class UrlRepository(private val urlDao: UrlDao) {
         return withContext(Dispatchers.IO) {
             try {
                 val normalizedUrl = normalizeUrl(url.url)
+                Log.d(TAG, "Sending ping to normalized URL: $normalizedUrl")
+                
                 val apiService = ApiClient.createApiService(normalizedUrl)
-                val response = apiService.pingUrl(normalizedUrl)
+                val response = apiService.pingUrl("")
+                
+                Log.d(TAG, "Ping response: ${response.code()} ${response.message()}")
                 
                 val isSuccess = response.isSuccessful
                 val status = if (isSuccess) PingStatus.SUCCESS else PingStatus.ERROR
@@ -80,6 +87,7 @@ class UrlRepository(private val urlDao: UrlDao) {
                 isSuccess
             } catch (e: Exception) {
                 // 예외 발생 시 오류로 처리
+                Log.e(TAG, "Ping failed with exception", e)
                 urlDao.updateUrlStatus(url.id, PingStatus.ERROR)
                 false
             }
@@ -93,7 +101,7 @@ class UrlRepository(private val urlDao: UrlDao) {
      * @return 정규화된 URL 문자열
      */
     private fun normalizeUrl(url: String): String {
-        var normalizedUrl = url
+        var normalizedUrl = url.trim()
         
         // URL이 http:// 또는 https://로 시작하지 않으면 https://를 추가
         if (!normalizedUrl.startsWith("http://") && !normalizedUrl.startsWith("https://")) {
@@ -105,6 +113,7 @@ class UrlRepository(private val urlDao: UrlDao) {
             normalizedUrl = "$normalizedUrl/"
         }
         
+        Log.d(TAG, "Normalized URL: $normalizedUrl")
         return normalizedUrl
     }
 }

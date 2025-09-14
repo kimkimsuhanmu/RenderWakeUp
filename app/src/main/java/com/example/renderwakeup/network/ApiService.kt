@@ -17,5 +17,5 @@ interface ApiService {
      * @return HTTP 응답
      */
     @GET
-    suspend fun pingUrl(@Url url: String = ""): Response<Any>
+    suspend fun pingUrl(@Url url: String = ""): Response<String>
 }

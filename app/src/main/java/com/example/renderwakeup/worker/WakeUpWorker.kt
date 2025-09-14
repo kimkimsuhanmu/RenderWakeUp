@@ -11,6 +11,8 @@ import androidx.work.workDataOf
 import com.example.renderwakeup.data.db.AppDatabase
 import com.example.renderwakeup.data.model.PingStatus
 import com.example.renderwakeup.data.repository.UrlRepository
+import com.example.renderwakeup.util.EmailConfigManager
+import com.example.renderwakeup.util.EmailSender
 import com.example.renderwakeup.util.NotificationHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -35,6 +37,10 @@ class WakeUpWorker(
     
     // 알림 헬퍼 초기화
     private val notificationHelper = NotificationHelper(context)
+    
+    // 이메일 관련 클래스 초기화
+    private val emailConfigManager = EmailConfigManager(context)
+    private val emailSender = EmailSender()
     
     /**
      * 백그라운드 작업을 수행합니다.
@@ -69,7 +75,11 @@ class WakeUpWorker(
                     
                     // 연속 3회 이상 실패 시 알림 표시
                     if (url.failCount + 1 >= 3) {
+                        // 알림 표시
                         notificationHelper.showPingFailureNotification(url, url.failCount + 1)
+                        
+                        // 이메일 알림 전송
+                        sendEmailNotification(url, url.failCount + 1)
                     }
                 }
             }
@@ -86,6 +96,119 @@ class WakeUpWorker(
         } catch (e: Exception) {
             Log.e(TAG, "WakeUpWorker failed", e)
             return Result.failure()
+        }
+    }
+    
+    /**
+     * 이메일 알림을 전송합니다.
+     * 
+     * @param url 실패한 URL 엔티티
+     * @param failCount 실패 횟수
+     */
+    private suspend fun sendEmailNotification(url: UrlEntity, failCount: Int) {
+        // 이메일 알림이 활성화되어 있고 이메일 주소가 설정되어 있는 경우에만 전송
+        if (!url.emailNotification || url.emailAddress.isNullOrEmpty()) {
+            Log.d(TAG, "Email notification not enabled for ${url.url}")
+            return
+        }
+        
+        // 이메일 설정 가져오기
+        val smtpConfig = emailConfigManager.getSmtpConfig()
+        if (smtpConfig == null) {
+            Log.w(TAG, "Email config not set up, using default Gmail config")
+            
+            // 기본 Gmail 설정 사용 (앱 비밀번호 필요)
+            if (url.emailAddress.contains("@gmail.com")) {
+                // 발신자와 수신자가 같은 Gmail 계정인 경우
+                sendEmailWithDefaultConfig(url, failCount)
+            } else {
+                Log.e(TAG, "Cannot send email: No valid SMTP configuration")
+            }
+            return
+        }
+        
+        // 이메일 제목 및 본문 생성
+        val subject = "렌더웨이크 알림: ${url.url} 핑 실패"
+        val body = """
+            안녕하세요,
+            
+            ${url.url} 사이트에 대한 핑이 $failCount회 연속 실패했습니다.
+            
+            마지막 시도 시간: ${url.lastPingTime}
+            
+            사이트가 정상적으로 작동하는지 확인해주세요.
+            
+            감사합니다.
+            렌더웨이크 앱
+        """.trimIndent()
+        
+        // 이메일 전송
+        try {
+            Log.d(TAG, "Sending email notification to ${url.emailAddress}")
+            val success = emailSender.sendEmail(
+                to = url.emailAddress,
+                subject = subject,
+                body = body,
+                smtpConfig = smtpConfig
+            )
+            
+            if (success) {
+                Log.d(TAG, "Email notification sent successfully")
+            } else {
+                Log.e(TAG, "Failed to send email notification")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error sending email notification", e)
+        }
+    }
+    
+    /**
+     * 기본 설정으로 이메일을 전송합니다. (Gmail 앱 비밀번호 필요)
+     */
+    private suspend fun sendEmailWithDefaultConfig(url: UrlEntity, failCount: Int) {
+        // 이메일 주소가 Gmail이 아니면 전송하지 않음
+        if (!url.emailAddress!!.endsWith("@gmail.com")) {
+            Log.e(TAG, "Cannot send email with default config: Recipient is not Gmail")
+            return
+        }
+        
+        // 이메일 제목 및 본문 생성
+        val subject = "렌더웨이크 알림: ${url.url} 핑 실패"
+        val body = """
+            안녕하세요,
+            
+            ${url.url} 사이트에 대한 핑이 $failCount회 연속 실패했습니다.
+            
+            마지막 시도 시간: ${url.lastPingTime}
+            
+            사이트가 정상적으로 작동하는지 확인해주세요.
+            
+            감사합니다.
+            렌더웨이크 앱
+        """.trimIndent()
+        
+        // 이메일 전송 (자기 자신에게 보내기)
+        try {
+            Log.d(TAG, "Attempting to send email using self-send method")
+            val username = url.emailAddress
+            // 앱 비밀번호는 사용자가 설정해야 함
+            val password = "앱 비밀번호를 설정하세요"
+            
+            val smtpConfig = EmailSender.SmtpConfig.gmail(username, password)
+            val success = emailSender.sendEmail(
+                to = url.emailAddress,
+                subject = subject,
+                body = body,
+                smtpConfig = smtpConfig
+            )
+            
+            if (success) {
+                Log.d(TAG, "Self-send email notification sent successfully")
+            } else {
+                Log.e(TAG, "Failed to send self-send email notification")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error sending self-send email notification", e)
         }
     }
     

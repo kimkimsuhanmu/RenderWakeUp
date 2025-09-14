@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="이메일 설정"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <CheckBox
+            android:id="@+id/cbEnableEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="이메일 알림 사용"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SMTP 서버"
+        android:textSize="14sp"
+        android:layout_marginBottom="4dp" />
+
+    <EditText
+        android:id="@+id/etSmtpHost"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="예: smtp.gmail.com"
+        android:text="smtp.gmail.com"
+        android:inputType="textUri"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SMTP 포트"
+        android:textSize="14sp"
+        android:layout_marginBottom="4dp" />
+
+    <EditText
+        android:id="@+id/etSmtpPort"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="예: 587"
+        android:text="587"
+        android:inputType="number"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="이메일 주소 (사용자 이름)"
+        android:textSize="14sp"
+        android:layout_marginBottom="4dp" />
+
+    <EditText
+        android:id="@+id/etUsername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="예: your.email@gmail.com"
+        android:inputType="textEmailAddress"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="비밀번호 (Gmail은 앱 비밀번호 필요)"
+        android:textSize="14sp"
+        android:layout_marginBottom="4dp" />
+
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="비밀번호"
+        android:inputType="textPassword"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:id="@+id/tvGmailHelp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Gmail 사용 시 앱 비밀번호가 필요합니다. 구글 계정 설정에서 2단계 인증을 활성화하고 앱 비밀번호를 생성하세요."
+        android:textSize="12sp"
+        android:textColor="#888888"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/btnTestEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="테스트 이메일 보내기"
+        android:layout_marginBottom="8dp" />
+
+</LinearLayout>

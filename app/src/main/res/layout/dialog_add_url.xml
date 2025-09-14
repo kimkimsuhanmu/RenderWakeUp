@@ -33,7 +33,7 @@
         android:id="@+id/etInterval"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="최소 15분"
+        android:hint="핑 간격 (1~600분)"
         android:inputType="number"
         android:text="15"
         android:layout_marginBottom="16dp" />

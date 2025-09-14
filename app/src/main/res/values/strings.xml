@@ -37,12 +37,14 @@
     <!-- 입력 필드 -->
     <string name="hint_url">URL (예: example.com)</string>
     <string name="hint_interval">핑 간격 (분, 최소 15분)</string>
+    <string name="hint_interval_range">핑 간격 (%1$d~%2$d분)</string>
     <string name="hint_email">이메일 주소</string>
     <string name="label_email_notification">이메일 알림</string>
     
     <!-- 오류 메시지 -->
     <string name="error_invalid_url">유효한 URL을 입력하세요.</string>
     <string name="error_invalid_interval">최소 15분 이상의 간격을 입력하세요.</string>
+    <string name="error_invalid_interval_range">%1$d~%2$d분 사이의 간격을 입력하세요.</string>
     <string name="error_invalid_email">유효한 이메일 주소를 입력하세요.</string>
     
     <!-- 상태 메시지 -->
