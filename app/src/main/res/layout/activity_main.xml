@@ -7,14 +7,76 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="렌더웨이크"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+        
+    <TextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Render 서버 슬립모드 방지 앱"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+        
+    <TextView
+        android:id="@+id/tvUrlListHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="모니터링 중인 URL"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvSubtitle" />
+        
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvUrlList"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/tvUrlListHeader"
+        app:layout_constraintBottom_toTopOf="@+id/btnAddUrl"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+        
+    <TextView
+        android:id="@+id/tvEmptyList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="등록된 URL이 없습니다.\n아래 + 버튼을 눌러 URL을 추가하세요."
+        android:textAlignment="center"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/rvUrlList"
+        app:layout_constraintEnd_toEndOf="@+id/rvUrlList"
+        app:layout_constraintStart_toStartOf="@+id/rvUrlList"
+        app:layout_constraintTop_toTopOf="@+id/rvUrlList" />
+        
+    <Button
+        android:id="@+id/btnAddUrl"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="URL 추가"
+        android:drawableStart="@android:drawable/ic_input_add"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
