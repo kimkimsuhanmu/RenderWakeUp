@@ -14,14 +14,14 @@ import java.util.concurrent.TimeUnit
  */
 object WorkManagerHelper {
     
-    // 최소 작업 주기 (15분)
-    private const val MIN_PERIODIC_INTERVAL_MINUTES = 15L
+    // 최소 작업 주기 (1분)
+    private const val MIN_PERIODIC_INTERVAL_MINUTES = 1L
     
     /**
      * 주기적인 URL 핑 작업을 예약합니다.
      * 
      * @param context 애플리케이션 컨텍스트
-     * @param intervalMinutes 작업 주기 (분 단위, 최소 15분)
+     * @param intervalMinutes 작업 주기 (분 단위, 최소 1분)
      */
     fun schedulePeriodicPingWork(context: Context, intervalMinutes: Long = MIN_PERIODIC_INTERVAL_MINUTES) {
         // 최소 주기 확인
@@ -48,7 +48,7 @@ object WorkManagerHelper {
         // 작업 예약 (이미 있으면 교체)
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             WakeUpWorker.WORK_NAME,
-            ExistingPeriodicWorkPolicy.REPLACE,
+            ExistingPeriodicWorkPolicy.UPDATE, // REPLACE 대신 UPDATE 사용 (권장)
             workRequest
         )
     }
