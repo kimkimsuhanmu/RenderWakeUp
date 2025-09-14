@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.renderwakeup.data.model.PingStatus
 import com.example.renderwakeup.data.model.UrlEntity
 import com.example.renderwakeup.data.repository.UrlRepository
+import com.example.renderwakeup.service.PingForegroundService
 import com.example.renderwakeup.util.EmailConfigManager
 import com.example.renderwakeup.util.EmailSender
 import com.example.renderwakeup.worker.WorkManagerHelper
@@ -67,8 +68,9 @@ class MainActivity : AppCompatActivity() {
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            // 권한이 승인되면 WorkManager 작업 예약
+            // 권한이 승인되면 WorkManager 작업 예약 및 포그라운드 서비스 시작
             WorkManagerHelper.schedulePeriodicPingWork(this)
+            PingForegroundService.startService(this)
         } else {
             // 권한이 거부되면 사용자에게 알림
             AlertDialog.Builder(this)
@@ -111,6 +113,9 @@ class MainActivity : AppCompatActivity() {
         
         // 알림 권한 확인 및 요청
         checkNotificationPermission()
+        
+        // 포그라운드 서비스 시작
+        startPingService()
     }
     
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -487,6 +492,25 @@ class MainActivity : AppCompatActivity() {
         } else {
             // Android 13 미만에서는 권한 요청 없이 WorkManager 작업 예약
             WorkManagerHelper.schedulePeriodicPingWork(this)
+        }
+    }
+    
+    /**
+     * 핑 포그라운드 서비스를 시작합니다.
+     */
+    private fun startPingService() {
+        // 알림 권한이 있는지 확인
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED) {
+                PingForegroundService.startService(this)
+            }
+            // 권한이 없으면 requestPermissionLauncher에서 권한 획득 후 서비스 시작
+        } else {
+            // Android 13 미만에서는 권한 확인 없이 서비스 시작
+            PingForegroundService.startService(this)
         }
     }
 }
